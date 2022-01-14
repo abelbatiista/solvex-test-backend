@@ -1,44 +1,80 @@
-from flask import Flask, jsonify, request
+from flask import Flask
 from flask_cors import CORS
-import controllers.user_controller as controller
+import controllers.user_controller as user_controller
+import controllers.product_controller as product_controller
+import controllers.file_controller as file_controller
 from database.database import create_tables
-from models.user_model import User
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
-app.route('/api/user', methods=['GET'])
+# User Routes
+
+@app.route('/api/user', methods=['GET'])
 def get_users():
-    users = controller.get()
-    return jsonify(users)
+    data = user_controller.get()
+    return data
 
-app.route('/api/user/<id>', methods=['GET'])
+@app.route('/api/user/<id>', methods=['GET'])
 def find_user_by_id(id):
-    user = controller.find_by_id(id)
-    return jsonify(user)
+    data = user_controller.find_by_id(id)
+    return data
 
-app.route('/api/user', methods=['POST'])
+@app.route('/api/user', methods=['POST'])
 def insert_user():
-    user_details = request.get_json()
-    user = User(user_details['name'], user_details['lastname'],
-                user_details['email'], user_details['password'],
-                user_details['role'], user_details['image'])
-    response = controller.insert(user)
-    return jsonify(response)
+    data = user_controller.insert()
+    return data
 
-app.route('/api/user/<id>', methods=['PUT'])
+@app.route('/api/user/<id>', methods=['PUT'])
 def update_user(id):
-    user_details = request.get_json()
-    user = User(user_details['name'], user_details['lastname'],
-                user_details['email'], user_details['password'],
-                user_details['role'], user_details['image'], id)
-    response = controller.update(user)
-    return jsonify(response)
+    data = user_controller.update(id)
+    return data
 
-app.route('/api/user/<id>', methods=['DELETE'])
+@app.route('/api/user/<id>', methods=['DELETE'])
 def delete_user(id):
-    response = controller.delete(id)
-    return jsonify(response)
+    data = user_controller.delete(id)
+    return data
+
+'''******************************************'''
+
+# Products Routes
+
+@app.route('/api/product', methods=['GET'])
+def get_products():
+    data = product_controller.get()
+    return data
+
+@app.route('/api/product/<id>', methods=['GET'])
+def find_product_by_id(id):
+    data = product_controller.find_by_id(id)
+    return data
+
+@app.route('/api/product', methods=['POST'])
+def insert_product():
+    data = product_controller.insert()
+    return data
+
+@app.route('/api/product/<id>', methods=['PUT'])
+def update_product(id):
+    data = product_controller.update(id)
+    return data
+
+@app.route('/api/product/<id>', methods=['DELETE'])
+def delete_product(id):
+    data = product_controller.delete(id)
+    return data
+
+'''******************************************'''
+
+# Uploads Routes
+
+@app.route('/api/file/upload/user/<id>', methods=['POST'])
+def upload_file(id):
+    return file_controller.upload_file(id)
+
+@app.route('/api/file/download/user/<id>', methods=['GET'])
+def download_file(id):
+    return file_controller.download_file(id)
 
 """
 Enable CORS. Disable it if you don't need CORS
