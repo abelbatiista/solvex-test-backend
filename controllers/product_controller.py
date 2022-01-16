@@ -13,15 +13,13 @@ def get():
         data = cursor.fetchall()
         list = []
         for _data in data:
-            dictionary = dict(id=_data[0], name=_data[1], price=_data[2], image=data[3])
+            dictionary = dict(id=_data[0], name=_data[1], price=_data[2], image=_data[3])
             list.append(dictionary)
         response = dict(ok=True, message='Successfully', products=list, total=len(list))
         return make_response(jsonify(response), 200)
     except (Exception):
         response = dict(ok=False, message='Error in Database.')
         return make_response(jsonify(response), 500)
-    finally:
-        database.close()
 
 def find_by_id(id: int):
     try:
@@ -38,9 +36,6 @@ def find_by_id(id: int):
     except(Exception):
         response = dict(ok=False, message='Error in Database.')
         return make_response(jsonify(response), 500)
-    finally:
-        database.close()
-
 
 def insert():
     try:
@@ -57,8 +52,6 @@ def insert():
     except(Exception):
         response = dict(ok=False, message='Error in Database.')
         return make_response(jsonify(response), 500)
-    finally:
-        database.close()
 
 def update(id: int):
     try:
@@ -75,8 +68,6 @@ def update(id: int):
     except(Exception):
         response = dict(ok=False, message='Error in Database.')
         return make_response(jsonify(response), 500)
-    finally:
-        database.close()
 
 def delete(id: int):
     try:
@@ -91,5 +82,3 @@ def delete(id: int):
     except(Exception):
         response = dict(ok=False, message='Error in Database.')
         return make_response(jsonify(response), 500)
-    finally:
-        database.close()

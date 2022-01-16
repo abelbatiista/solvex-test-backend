@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_cors import CORS
+import controllers.auth_controller as auth_controller
 import controllers.user_controller as user_controller
 import controllers.product_controller as product_controller
 import controllers.file_controller as file_controller
@@ -7,6 +8,33 @@ from database.database import create_tables
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
+
+# Render
+
+@app.route('/', methods=['GET'])
+def root():
+    return render_template('index.html')
+
+'''******************************************'''
+
+# Auth Routes
+
+@app.route('/api/auth', methods=['POST'])
+def login():
+    data = auth_controller.login()
+    return data
+
+@app.route('/api/auth', methods=['GET'])
+def login_check():
+    data = auth_controller.login_check()
+    return data
+
+@app.route('/api/auth', methods=['PUT'])
+def logout():
+    data = auth_controller.logout()
+    return data
+
+'''******************************************'''
 
 # User Routes
 
@@ -68,13 +96,13 @@ def delete_product(id):
 
 # Uploads Routes
 
-@app.route('/api/file/upload/user/<id>', methods=['POST'])
-def upload_file(id):
-    return file_controller.upload_file(id)
+@app.route('/api/file/upload/<collection>/<id>', methods=['PUT'])
+def upload_file(collection: str, id: int):
+    return file_controller.upload_file(id, collection)
 
-@app.route('/api/file/download/user/<id>', methods=['GET'])
-def download_file(id):
-    return file_controller.download_file(id)
+@app.route('/api/file/download/<collection>/<image>', methods=['GET'])
+def download_file(collection: str, image: str):
+    return file_controller.download_file(collection, image)
 
 """
 Enable CORS. Disable it if you don't need CORS

@@ -13,20 +13,21 @@ def create_tables():
         """
             CREATE TABLE IF NOT EXISTS user 
             (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 name TEXT NOT NULL,
                 lastname TEXT NOT NULL,
-                email TEXT NOT NULL,
+                email TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL,
-                role TEXT NOT NULL,
-                image TEXT NOT NULL
+                role TEXT DEFAULT 'USER_ROLE' NOT NULL,
+                image TEXT NULL,
+                token TEXT NULL
             )
         """,
         """
             CREATE TABLE IF NOT EXISTS product 
             (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
+                name TEXT UNIQUE NOT NULL,
                 price REAL NOT NULL,
                 image TEXT NOT NULL
             )
