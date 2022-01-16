@@ -3,6 +3,8 @@ from flask import Flask, flash, request, redirect, url_for, send_from_directory,
 from werkzeug.utils import secure_filename
 from database.database import get_database
 
+database = get_database()
+
 def __user(id: int, collection: str):
     database = get_database()
     cursor = database.cursor()
@@ -49,13 +51,21 @@ def upload_file(id: int, collection: str):
                     return make_response(jsonify(response), 404)
                 extension = file.filename.split('.')[1]
                 filename = secure_filename(f'{binascii.b2a_hex(os.urandom(10))}.{extension}')
+                if(user[6] != None):
+                    try:
+                        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], user[6]))
+                    except:
+                        database = get_database()
+                        cursor = database.cursor()
+                        query = f'UPDATE {collection} SET image = NULL WHERE id = ?'
+                        cursor.execute(query, [id])
+                        database.commit()
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], user.image))
                 database = get_database()
                 cursor = database.cursor()
                 query = f'UPDATE {collection} SET image = ? WHERE id = ?'
-                a = cursor.execute(query, [filename, id])
-                b = database.commit()
+                cursor.execute(query, [filename, id])
+                database.commit()
                 response = dict(ok=True, message='Successfully')
                 return make_response(jsonify(response), 200)
                 # *return redirect(url_for('download_file', name=filename))

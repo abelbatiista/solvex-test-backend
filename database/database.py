@@ -29,7 +29,7 @@ def create_tables():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT UNIQUE NOT NULL,
                 price REAL NOT NULL,
-                image TEXT NOT NULL
+                image TEXT
             )
         """
     ]
