@@ -1,5 +1,5 @@
-from flask import Flask, render_template
-from flask_cors import CORS
+from flask import Flask, render_template, request
+from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send
 import controllers.auth_controller as auth_controller
 import controllers.user_controller as user_controller
@@ -9,14 +9,38 @@ from database.database import create_tables
 
 app = Flask(__name__)
 app.config['SECRET_KET'] = 'secret'
-socketio = SocketIO(app)
-CORS(app, supports_credentials=True)
+app.config['CORS_HEADERS'] = 'Content-Type'
+socketio = SocketIO(app, cors_allowed_origins="*")
+cors = CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "*"}})
 
 # Real Time with sockets
 
 '''******************************************'''
 
+users = {}
+@socketio.on('connect')
+def on_connect():
+    print('Client connected')
+    socketio.emit('my response', {'data': 'Connected'})
 
+@socketio.on('disconnect')
+def on_disconnect():
+    users.pop(request.sid,'No user found')
+    socketio.emit('current_users', users)
+    print("User disconnected!\nThe users are: ", users)
+
+@socketio.on('sign_in')
+def user_sign_in(user_name, methods=['GET', 'POST']):
+    users[request.sid] = user_name['name']
+    socketio.emit('current_users', users)
+    print("New user sign in!\nThe users are: ", users)
+
+@socketio.on('message')
+def messaging(message, methods=['GET', 'POST']):
+    print('received message: ' + str(message))
+    message['from'] = request.sid
+    socketio.emit('message', message, room=request.sid)
+    socketio.emit('message', message, room=message['to'])
 
 # Render
 
@@ -29,16 +53,19 @@ def root():
 # Auth Routes
 
 @app.route('/api/auth', methods=['POST'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def login():
     data = auth_controller.login()
     return data
 
 @app.route('/api/auth', methods=['GET'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def login_check():
     data = auth_controller.login_check()
     return data
 
 @app.route('/api/auth', methods=['PUT'])
+@cross_origin(origin='localhost', headers=['Content-Type', 'Authorization'])
 def logout():
     data = auth_controller.logout()
     return data
@@ -53,7 +80,7 @@ def get_users():
     return data
 
 @app.route('/api/user/<id>', methods=['GET'])
-def find_user_by_id(id):
+def find_user_by_id(id: int):
     data = user_controller.find_by_id(id)
     return data
 
@@ -63,12 +90,12 @@ def insert_user():
     return data
 
 @app.route('/api/user/<id>', methods=['PUT'])
-def update_user(id):
+def update_user(id: int):
     data = user_controller.update(id)
     return data
 
 @app.route('/api/user/<id>', methods=['DELETE'])
-def delete_user(id):
+def delete_user(id: int):
     data = user_controller.delete(id)
     return data
 
@@ -82,7 +109,7 @@ def get_products():
     return data
 
 @app.route('/api/product/<id>', methods=['GET'])
-def find_product_by_id(id):
+def find_product_by_id(id: int):
     data = product_controller.find_by_id(id)
     return data
 
@@ -92,12 +119,12 @@ def insert_product():
     return data
 
 @app.route('/api/product/<id>', methods=['PUT'])
-def update_product(id):
+def update_product(id: int):
     data = product_controller.update(id)
     return data
 
 @app.route('/api/product/<id>', methods=['DELETE'])
-def delete_product(id):
+def delete_product(id: int):
     data = product_controller.delete(id)
     return data
 
@@ -121,7 +148,7 @@ def after_request(response):
     response.headers["Access-Control-Allow-Origin"] = "*" # <- You can change "*" for a domain for example "http://localhost"
     response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS, PUT, DELETE"
-    response.headers["Access-Control-Allow-Headers"] = "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+    response.headers["Access-Control-Allow-Headers"] = "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, x-token"
     return response
 
 if __name__ == '__main__':
@@ -131,4 +158,4 @@ if __name__ == '__main__':
        Remember that, in order to make this API functional, you must set debug in False
     """
     # *app.run(host='0.0.0.0', port=8000, debug=False)
-    socketio.run(app.run(host='0.0.0.0', port=8000, debug=False))
+    socketio.run(app, host='0.0.0.0', port=8000, debug=True)

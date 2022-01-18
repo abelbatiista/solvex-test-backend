@@ -31,6 +31,24 @@ def create_tables():
                 price REAL NOT NULL,
                 image TEXT
             )
+        """,
+        """
+            CREATE TABLE IF NOT EXISTS message 
+            (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL,
+                price REAL NOT NULL,
+                image TEXT
+            )
+        """,
+        """
+            CREATE TABLE IF NOT EXISTS product 
+            (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL,
+                price REAL NOT NULL,
+                image TEXT
+            )
         """
     ]
     database = get_database()

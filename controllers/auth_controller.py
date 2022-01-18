@@ -1,7 +1,7 @@
 from flask import Flask, request, make_response, jsonify
 from database.database import get_database
 from models.user_model import User
-from helpers.token_helper import get_token, get_token_user
+from helpers.token_helper import get_token, get_token_user, get_user_by_token
 app = Flask(__name__)
 
 def login():
@@ -28,15 +28,11 @@ def login():
 
 def login_check():
     try:
-        if(get_token_user() == None):
-            response = dict(ok=False, message='No token found.')
+        token = str(request.headers['x-token'])
+        data = get_user_by_token(token)
+        if (data == None):
+            response = dict(ok=False, message='No user found.')
             return make_response(jsonify(response), 400)
-        id = get_token_user()
-        database = get_database()
-        cursor = database.cursor()
-        query = 'SELECT * FROM user WHERE id = ?'
-        cursor.execute(query, [id])
-        data = cursor.fetchone()
         dictionary = dict(id=data[0], name=data[1], lastname=data[2], email=data[3], password=data[4],
                           role=data[5], image=data[6])
         response = dict(ok=True, message='Successfully', user=dictionary, token=str(data[7]))
