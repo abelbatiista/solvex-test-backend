@@ -39,7 +39,7 @@ def messagering(methods=['GET', 'POST']):
 @socketio.on('message')
 def messaging(message, methods=['GET', 'POST']):
     print('received message: ' + str(message))
-    message_controller.insert(Message(message['from'], message['to'], message['message'], message['date']))
+    messages.append(message)
     socketio.emit('message', message)
     socketio.emit('messages', messages)
 
@@ -98,6 +98,20 @@ def update_user(id: int):
 @app.route('/api/user/<id>', methods=['DELETE'])
 def delete_user(id: int):
     data = user_controller.delete(id)
+    return data
+
+'''******************************************'''
+
+# User Routes
+
+@app.route('/api/message', methods=['GET'])
+def get_messages():
+    data = message_controller.get()
+    return data
+
+@app.route('/api/message', methods=['POST'])
+def insert_message():
+    data = message_controller.insert()
     return data
 
 '''******************************************'''
@@ -201,5 +215,5 @@ if __name__ == '__main__':
        Here you can change debug and port
        Remember that, in order to make this API functional, you must set debug in False
     """
-    # *app.run(host='0.0.0.0', port=8000, debug=False)
-    socketio.run(app, debug=True)
+    # // *app.run(host='0.0.0.0', port=8000, debug=False)
+    socketio.run(app, host='0.0.0.0', port=8000, debug=True)

@@ -5,7 +5,7 @@ from database.database import get_database
 
 database = get_database()
 
-def __user(id: int, collection: str):
+def __data(id: int, collection: str):
     database = get_database()
     cursor = database.cursor()
     query = f'SELECT * FROM {collection} WHERE id = ?'
@@ -45,21 +45,32 @@ def upload_file(id: int, collection: str):
                 # *flash('No selected file')
                 # *return redirect(request.url)
             if file and allowed_file(file.filename, ALLOWED_EXTENSIONS):
-                user = __user(id, collection)
-                if(user == None):
+                data = __data(id, collection)
+                if(data == None):
                     response = dict(ok=False, message='Element not exists')
                     return make_response(jsonify(response), 404)
                 extension = file.filename.split('.')[1]
                 filename = secure_filename(f'{binascii.b2a_hex(os.urandom(10))}.{extension}')
-                if(user[6] != None):
-                    try:
-                        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], user[6]))
-                    except:
-                        database = get_database()
-                        cursor = database.cursor()
-                        query = f'UPDATE {collection} SET image = NULL WHERE id = ?'
-                        cursor.execute(query, [id])
-                        database.commit()
+                if(collection == 'user'):
+                    if(data[6] != None):
+                        try:
+                            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], data[6]))
+                        except:
+                            database = get_database()
+                            cursor = database.cursor()
+                            query = f'UPDATE {collection} SET image = NULL WHERE id = ?'
+                            cursor.execute(query, [id])
+                            database.commit()
+                elif(collection == 'product'):
+                    if (data[3] != None):
+                        try:
+                            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], data[3]))
+                        except:
+                            database = get_database()
+                            cursor = database.cursor()
+                            query = f'UPDATE {collection} SET image = NULL WHERE id = ?'
+                            cursor.execute(query, [id])
+                            database.commit()
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 database = get_database()
                 cursor = database.cursor()

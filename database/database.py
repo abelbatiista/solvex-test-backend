@@ -36,7 +36,7 @@ def create_tables():
             CREATE TABLE IF NOT EXISTS message 
             (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                from_id INTEGER UNIQUE NOT NULL,
+                from_id INTEGER NOT NULL,
                 to_id INTEGER NOT NULL,
                 message TEXT NOT NULL,
                 date TEXT NOT NULL
