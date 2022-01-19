@@ -202,4 +202,4 @@ if __name__ == '__main__':
        Remember that, in order to make this API functional, you must set debug in False
     """
     # *app.run(host='0.0.0.0', port=8000, debug=False)
-    socketio.run(app, host='0.0.0.0', port=8000, debug=True)
+    socketio.run(app, debug=True)
