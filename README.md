@@ -2,9 +2,9 @@
 
 This project was made in Python 3.10.1
 
-## Development server
+## Api Documentation (on local host)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Link: https://web.postman.co/workspace/My-Workspace~0e0d2e89-e012-4380-8667-60f6ad9530f5/documentation/13757439-cbd962c8-cc52-424a-9a66-f8ca904cfcfd
 
 ## Code scaffolding
 
