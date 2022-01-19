@@ -32,7 +32,7 @@ Run `env\Scripts\activate.bat`, this will allow you to debug python file.
 
 ## Install Packages
 
-Run `py -m pip install -r requirements.txt`.
+Run `py -m pip install -r requirements.txt`. If it does not work, install package manually.
 
 ## Debug
 
