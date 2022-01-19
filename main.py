@@ -4,7 +4,13 @@ from flask_socketio import SocketIO, send
 import controllers.auth_controller as auth_controller
 import controllers.user_controller as user_controller
 import controllers.product_controller as product_controller
+import controllers.location_controller as location_controller
+import controllers.method_controller as method_controller
+import controllers.order_controller as order_controller
 import controllers.file_controller as file_controller
+import controllers.message_controller as message_controller
+from controllers.socket_controller import users, messages
+from models.message_model import Message
 from database.database import create_tables
 
 app = Flask(__name__)
@@ -17,30 +23,24 @@ cors = CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "*
 
 '''******************************************'''
 
-users = {}
 @socketio.on('connect')
 def on_connect():
     print('Client connected')
-    socketio.emit('my response', {'data': 'Connected'})
 
 @socketio.on('disconnect')
 def on_disconnect():
-    users.pop(request.sid,'No user found')
-    socketio.emit('current_users', users)
-    print("User disconnected!\nThe users are: ", users)
+    print("User disconnected!")
 
-@socketio.on('sign_in')
-def user_sign_in(user_name, methods=['GET', 'POST']):
-    users[request.sid] = user_name['name']
-    socketio.emit('current_users', users)
-    print("New user sign in!\nThe users are: ", users)
+@socketio.on('login')
+def messagering(methods=['GET', 'POST']):
+    socketio.emit('messages', messages)
 
 @socketio.on('message')
 def messaging(message, methods=['GET', 'POST']):
     print('received message: ' + str(message))
-    message['from'] = request.sid
-    socketio.emit('message', message, room=request.sid)
-    socketio.emit('message', message, room=message['to'])
+    message_controller.insert(Message(message['from'], message['to'], message['message'], message['date']))
+    socketio.emit('message', message)
+    socketio.emit('messages', messages)
 
 # Render
 
@@ -130,6 +130,48 @@ def delete_product(id: int):
 
 '''******************************************'''
 
+# Locations Routes
+
+@app.route('/api/location/<id>', methods=['GET'])
+def get_location_by_user(id: int):
+    data = location_controller.get(id)
+    return data
+
+@app.route('/api/location', methods=['POST'])
+def insert_location():
+    data = location_controller.insert()
+    return data
+
+'''******************************************'''
+
+# Methods Routes
+
+@app.route('/api/method/<id>', methods=['GET'])
+def get_method_by_user(id: int):
+    data = method_controller.get(id)
+    return data
+
+@app.route('/api/method', methods=['POST'])
+def insert_method():
+    data = method_controller.insert()
+    return data
+
+'''******************************************'''
+
+# Orders Routes
+
+@app.route('/api/order/<id>', methods=['GET'])
+def get_order_by_user(id: int):
+    data = order_controller.get(id)
+    return data
+
+@app.route('/api/order', methods=['POST'])
+def insert_order():
+    data = order_controller.insert()
+    return data
+
+'''******************************************'''
+
 # Uploads Routes
 
 @app.route('/api/file/upload/<collection>/<id>', methods=['PUT'])
@@ -153,6 +195,7 @@ def after_request(response):
 
 if __name__ == '__main__':
     create_tables()
+    messages = messages()
     """
        Here you can change debug and port
        Remember that, in order to make this API functional, you must set debug in False

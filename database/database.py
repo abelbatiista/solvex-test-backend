@@ -36,18 +36,48 @@ def create_tables():
             CREATE TABLE IF NOT EXISTS message 
             (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT UNIQUE NOT NULL,
-                price REAL NOT NULL,
-                image TEXT
+                from_id INTEGER UNIQUE NOT NULL,
+                to_id INTEGER NOT NULL,
+                message TEXT NOT NULL,
+                date TEXT NOT NULL
             )
         """,
         """
-            CREATE TABLE IF NOT EXISTS product 
+            CREATE TABLE IF NOT EXISTS method 
             (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT UNIQUE NOT NULL,
-                price REAL NOT NULL,
-                image TEXT
+                user INTEGER NOT NULL,
+                brand TEXT NOT NULL,
+                number TEXT NOT NULL,
+                expiration TEXT NOT NULL,
+                cvv TEXT NOT NULL
+            )
+        """,
+        """
+            CREATE TABLE IF NOT EXISTS location 
+            (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user INTEGER NOT NULL,
+                label TEXT NOT NULL,
+                adress TEXT NOT NULL,
+                street TEXT NOT NULL,
+                number TEXT NOT NULL,
+                sector TEXT NOT NULL,
+                city TEXT NOT NULL,
+                province TEXT NOT NULL,
+                country TEXT NOT NULL,
+                code TEXT NOT NULL
+            )
+        """,
+        """
+            CREATE TABLE IF NOT EXISTS _order
+            (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user INTEGER NOT NULL,
+                product INTEGER NOT NULL,
+                location INTEGER NOT NULL,
+                method INTEGER NOT NULL,
+                _order TEXT NOT NULL
             )
         """
     ]

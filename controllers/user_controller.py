@@ -2,6 +2,8 @@ from flask import Flask, request, make_response, jsonify
 from database.database import get_database
 from models.user_model import User
 
+app = Flask(__name__)
+
 def __users():
     database = get_database()
     cursor = database.cursor()
@@ -14,8 +16,6 @@ def __users():
                           role=_data[5], image=_data[6])
         list.append(dictionary)
     return list
-
-app = Flask(__name__)
 
 def get():
     try:
