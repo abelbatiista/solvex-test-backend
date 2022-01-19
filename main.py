@@ -12,6 +12,7 @@ import controllers.message_controller as message_controller
 from controllers.socket_controller import users, messages
 from models.message_model import Message
 from database.database import create_tables
+import os
 
 app = Flask(__name__)
 app.config['SECRET_KET'] = 'secret'
